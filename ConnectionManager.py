@@ -27,4 +27,3 @@ class ConnetionManager:
             await client.send_text(msg)
 
     
-conn = ConnetionManager()
