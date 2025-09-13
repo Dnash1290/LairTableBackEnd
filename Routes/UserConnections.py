@@ -1,13 +1,17 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from Game.MainGame import game
 from typing import Dict, List, Type
-from Actions import game_start 
+from .Actions import *
 from modules.UserActivity import *
 
 conn_router = APIRouter()
 
 ACTION_HANDLERS: Dict[str,tuple[Type, callable]]={
-    "game.start": (StartAct,game_start)
+    # game ---------------------
+    "game.start": (StartAct,game_start),
+
+    #player ------
+    "player.info":(PlayerInfo, player_info)
 }
 
 
@@ -26,13 +30,13 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
             action_type = msg.get("action")
 
             if action_type not in ACTION_HANDLERS:
-                websocket.send_json({
+                await websocket.send_json({
                     "action":"invalid action","action_name":action_type
                 })
             
             Model, handle = ACTION_HANDLERS[action_type]
             data = Model(**msg)
-            handle(websocket, client_id, data)         
+            await handle(websocket, client_id, data)         
 
     except WebSocketDisconnect:
         game.connection.disconnect(client_id)

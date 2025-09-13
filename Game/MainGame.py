@@ -1,4 +1,5 @@
 from ConnectionManager import ConnetionManager
+from fastapi import WebSocket
 from random import choice
 
 
@@ -13,7 +14,11 @@ class MainGame:
     
     def choose_imposter(self):
         return {"imposter": choice(self.connection.connections_dict.keys()[0])}
-        
+    
+    async def start_game(self):
+        self.game_status="starting"
+
+
 
 
 game = MainGame()
