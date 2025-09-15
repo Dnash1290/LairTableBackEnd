@@ -13,20 +13,20 @@ async def game_start(ws:WebSocket, client_id:str, data):
                 "message":"game is starting"
             }})
     
-    game.start_game()
+ 
     imposter:str = game.choose_imposter()
     game_word:dict = game.choose_word()
+    game_status:dict = game.time_stp("game starting",30)
 
     
     await game.connection.echo_all({
-        "action":"game.imposter",
-        "data": imposter
-            })
+        "action":"game.starting",
+        "data":{
+            "imposter":imposter,
+            "word": game_word,
+            "game_status":game_status
+            }})
 
-    await game.connection.echo_all({
-        "action":"game.word",
-        "data": game_word
-            })
     
 async def player_info(ws:WebSocket, client_id:str, data:dict):
     pass
