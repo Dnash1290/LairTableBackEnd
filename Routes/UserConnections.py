@@ -23,7 +23,7 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
     payload = {"action":"player.log","data":join}
 
     try:
-        await game.connection.echo_all(str(payload))
+        await game.connection.echo_all(payload)
 
         while True:
             msg:dict = await websocket.receive_json()
@@ -40,12 +40,12 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
 
     except WebSocketDisconnect:
         game.connection.disconnect(client_id)
-        await game.connection.echo_all(str({
+        await game.connection.echo_all({
             "action":"player.log",
             "data":{
                 "message":f"player {client_id} has left the game",
                 "client_id":client_id
             }
-        }))
+        })
 
 

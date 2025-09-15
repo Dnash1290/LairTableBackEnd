@@ -25,6 +25,6 @@ class ConnetionManager:
 
     async def echo_all(self, msg):
         for client in self.connections_dict.values():
-            await client.send_text(msg)
+            await client.send_text(str(msg))
 
     

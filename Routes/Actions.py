@@ -7,7 +7,7 @@ async def game_start(ws:WebSocket, client_id:str, data):
     if data.data.get("player_type", "OBJECT") != "host":
         return
     
-    game.connection.echo_all({
+    await game.connection.echo_all({
             "action":"game.status",
             "data":{
                 "message":"game is starting"
@@ -20,15 +20,13 @@ async def game_start(ws:WebSocket, client_id:str, data):
     
     await game.connection.echo_all({
         "action":"game.imposter",
-        "data":{
-            "imposter": imposter
-            }})
+        "data": imposter
+            })
 
     await game.connection.echo_all({
         "action":"game.word",
-        "data":{
-            "choice":game_word
-        }})
+        "data": game_word
+            })
     
 async def player_info(ws:WebSocket, client_id:str, data:dict):
     pass

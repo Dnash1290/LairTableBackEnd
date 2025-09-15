@@ -1,6 +1,6 @@
 from ConnectionManager import ConnetionManager
 from fastapi import WebSocket
-from random import choice
+import random
 
 
 class MainGame:
@@ -9,13 +9,14 @@ class MainGame:
         self.chat: None
         self.game_status:None
 
-    def choose_word():
+    def choose_word(self):
         return {"category":"disability", "word":"shennoy"}
     
     def choose_imposter(self):
-        return {"imposter": choice(self.connection.connections_dict.keys()[0])}
+        imposter = random.choice(list(self.connection.connections_dict.keys())[0])
+        return {"imposter": imposter}
     
-    async def start_game(self):
+    def start_game(self):
         self.game_status="starting"
 
 
