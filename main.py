@@ -22,9 +22,8 @@ app.include_router(
 
 @app.get("/")
 def read_root():
-    return {"message": "shennoy is gay!"}
+    return {"message": "lowtaperfaaade"*4}
 
 @app.get("/api/test")
 def test_endpoint():
     return {"data": "This is test data from backend"}
-

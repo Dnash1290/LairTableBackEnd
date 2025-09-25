@@ -1,5 +1,6 @@
 from fastapi import WebSocket
 from typing import Dict
+import json
 
 class ConnetionManager:
     def __init__(self):
@@ -14,7 +15,11 @@ class ConnetionManager:
         
         if client_id not in self.connections_dict:
             self.connections_dict[client_id] = websocket       
-            return {"success":True, "message":f"{client_id} has joined"}
+            return {
+                "success":True, 
+                "client":client_id,
+                "message":f"{client_id} has joined"
+                }
 
         await websocket.close(code=1001, reason=f"{client_id} already has joined in" )
         return {"success":False, "message":f"{client_id} already has joined in"}
@@ -25,6 +30,6 @@ class ConnetionManager:
 
     async def echo_all(self, msg):
         for client in self.connections_dict.values():
-            await client.send_text(str(msg))
+            await client.send_text(json.dumps(msg))
 
     

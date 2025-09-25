@@ -40,6 +40,7 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
 
     except WebSocketDisconnect:
         game.connection.disconnect(client_id)
+        print(WebSocketDisconnect)
         await game.connection.echo_all({
             "action":"player.log",
             "data":{
@@ -48,4 +49,8 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
             }
         })
 
+
+conn_router.get("/get_users")
+def get_users():
+    return{"usernames":game.connection.connections_dict.keys()}
 
