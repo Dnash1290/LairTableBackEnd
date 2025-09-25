@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
 from Game.MainGame import game
 from typing import Dict, List, Type
 from .Actions import *
@@ -45,12 +45,26 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
             "action":"player.log",
             "data":{
                 "message":f"player {client_id} has left the game",
-                "client_id":client_id
+                "client":client_id
             }
         })
 
 
-conn_router.get("/get_users")
+@conn_router.get("/get_users")
 def get_users():
-    return{"usernames":game.connection.connections_dict.keys()}
+    keys = list(game.connection.connections_dict.keys())
+    print("num of users", keys)
+    if len(keys) <= 1:
+        print(len(keys))
+        raise HTTPException(status_code=404, detail="you joined the room 1st")
+
+    temp = []
+    for user in keys:
+        temp_dic = {"data":{}}
+        temp_dic["data"]["success"] = True
+        temp_dic["data"]["message"] = f"{user} has joined in"
+        temp_dic["data"]["client"] = user
+        temp.append(temp_dic)
+
+    return{"clients": temp}
 
