@@ -62,7 +62,7 @@ def get_users():
     for user in keys:
         temp_dic = {"data":{}}
         temp_dic["data"]["success"] = True
-        temp_dic["data"]["message"] = f"{user} has joined in"
+        temp_dic["data"]["message"] = f"{user} has joined"
         temp_dic["data"]["client"] = user
         temp.append(temp_dic)
 

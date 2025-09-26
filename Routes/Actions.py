@@ -4,15 +4,8 @@ from Game.MainGame import game
 
 async def game_start(ws:WebSocket, client_id:str, data):
     print(data.data,"OBJECT")
-    if data.data.get("player_type", "OBJECT") != "host":
-        return
-    
-    await game.connection.echo_all({
-            "action":"game.status",
-            "data":{
-                "message":"game is starting"
-            }})
-    
+    if data.data.get("player_type") != "host":
+        return    
  
     imposter:str = game.choose_imposter()
     game_word:dict = game.choose_word()
