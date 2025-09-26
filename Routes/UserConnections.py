@@ -63,8 +63,8 @@ def get_users():
 
     for user in keys:
         filt = game.connection.connections_dict[user].copy()
-        
-        print(filt)
+        filt.pop("ws", None)
+       
         temp_dic = {"data":{}}
         temp_dic["data"]["success"] = True
         temp_dic["data"]["message"] = f"{user} has joined"
