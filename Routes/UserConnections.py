@@ -3,6 +3,7 @@ from Game.MainGame import game
 from typing import Dict, List, Type
 from .Actions import *
 from modules.UserActivity import *
+import time
 
 conn_router = APIRouter()
 
@@ -57,14 +58,19 @@ def get_users():
     if len(keys) <= 1:
         print(len(keys))
         raise HTTPException(status_code=404, detail="you joined the room 1st")
-
+ 
     temp = []
+
     for user in keys:
+        filt = game.connection.connections_dict[user].copy()
+        
+        print(filt)
         temp_dic = {"data":{}}
         temp_dic["data"]["success"] = True
         temp_dic["data"]["message"] = f"{user} has joined"
-        temp_dic["data"]["client"] = user
+        temp_dic["data"]["client"] =  filt
         temp.append(temp_dic)
 
+ 
     return{"clients": temp}
 

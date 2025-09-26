@@ -14,10 +14,24 @@ class ConnetionManager:
             return {"success":False, "message":f"{room_id} room is invalid"}
         
         if client_id not in self.connections_dict:
-            self.connections_dict[client_id] = websocket       
+
+            self.connections_dict[client_id] = {
+                "ws": websocket,
+                "client": client_id
+            }
+
+            if len(self.connections_dict) == 1:
+                self.connections_dict[client_id]["isHost"] = True  
+            else:
+                self.connections_dict[client_id]["isHost"] = False
+
+            filt = self.connections_dict[client_id].copy()
+            filt.pop("ws",None)
+            print(filt, "FILT")
+
             return {
                 "success":True, 
-                "client":client_id,
+                "client":filt,
                 "message":f"{client_id} has joined"
                 }
 
@@ -29,7 +43,10 @@ class ConnetionManager:
         print(self.connections_dict, "fkidps")
 
     async def echo_all(self, msg):
-        for client in self.connections_dict.values():
-            await client.send_text(json.dumps(msg))
-
+        
+        try:
+            for client in self.connections_dict.keys():
+                await self.connections_dict[client]["ws"].send_text(json.dumps(msg))
+        except:
+            raise ValueError(msg)
     
