@@ -2,7 +2,7 @@ from ConnectionManager import ConnetionManager
 from fastapi import WebSocket
 import random
 from datetime import datetime, timedelta, timezone
-
+from copy import deepcopy
 
 class MainGame:
     def __init__(self):
@@ -14,9 +14,19 @@ class MainGame:
         self.category:str
 
     def get_all_users(self):
-        filt = self.connection.connections_dict.copy()
-        for client in filt: filt[client].pop("ws", None)
-        return filt
+        print("------- Original connections ------")
+        print(self.connection.connections_dict)
+
+        # Build a new dict without the WebSocket objects
+        filtered_users = {}
+        for client_id, client_info in self.connection.connections_dict.items():
+            filtered_users[client_id] = {
+                key: value for key, value in client_info.items() if key != "ws"
+            }
+
+        print("------- Filtered connections (no ws) ------")
+        print(filtered_users)
+        return filtered_users
 
     def choose_word(self):
         self.category, self.word = "disabilty", "shennoy"

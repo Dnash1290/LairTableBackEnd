@@ -43,10 +43,21 @@ class ConnetionManager:
         print(self.connections_dict, "fkidps")
 
     async def echo_all(self, msg):
+        disconnected_clients = []
         
-        try:
-            for client in self.connections_dict.keys():
+        for client in list(self.connections_dict.keys()):
+            try:
+                if "ws" not in self.connections_dict[client]:
+                    disconnected_clients.append(client)
+                    continue
+                    
                 await self.connections_dict[client]["ws"].send_text(json.dumps(msg))
-        except:
-            raise ValueError(msg)
-    
+                
+            except Exception as e:
+                print(f"Failed to send to {client}: {str(e)}")
+                disconnected_clients.append(client)
+                
+        # Clean up disconnected clients
+        for client in disconnected_clients:
+            self.disconnect(client)
+        
