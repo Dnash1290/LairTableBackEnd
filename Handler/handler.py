@@ -1,8 +1,8 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
 from Game.MainGame import game
 from typing import Dict, List, Type
-from .Actions import *
-from modules.UserActivity import *
+from Game.Actions import *
+from Game.modules.UserActivity import *
 import time
 
 conn_router = APIRouter()

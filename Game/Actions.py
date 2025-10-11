@@ -1,4 +1,4 @@
-from modules import UserActivity
+from .modules import UserActivity
 from fastapi import WebSocket
 from Game.MainGame import game
 import time, asyncio

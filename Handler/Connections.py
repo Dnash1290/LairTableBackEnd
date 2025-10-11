@@ -1,10 +1,11 @@
 from fastapi import WebSocket
 from typing import Dict
+from .Player import Player
 import json
 
 class ConnetionManager:
     def __init__(self):
-        self.connections_dict: Dict = {}
+        self.connections_dict: Dict[str, Player] = {}
         self.rooms = ["testRoom"]
 
     async def connect(self, client_id:str, room_id,websocket: WebSocket):
@@ -14,21 +15,14 @@ class ConnetionManager:
             return {"success":False, "message":f"{room_id} room is invalid"}
         
         if client_id not in self.connections_dict:
-
-            self.connections_dict[client_id] = {
-                "ws": websocket,
-                "client": client_id
-            }
+            print(self.connections_dict,"gfsdgvdfs", client_id)
+            player = Player(username=client_id)
+            self.connections_dict[client_id] = player
 
             if len(self.connections_dict) == 1:
-                self.connections_dict[client_id]["isHost"] = True  
-            else:
-                self.connections_dict[client_id]["isHost"] = False
+                self.connections_dict[client_id].IsHost = True
 
-            filt = self.connections_dict[client_id].copy()
-            filt.pop("ws",None)
-            print(filt, "FILT")
-
+            filt = self.connections_dict[client_id].dict()
             return {
                 "success":True, 
                 "client":filt,

@@ -1,4 +1,4 @@
-from ConnectionManager import ConnetionManager
+from Handler.Connections import ConnetionManager
 from fastapi import WebSocket
 import random
 from datetime import datetime, timedelta, timezone

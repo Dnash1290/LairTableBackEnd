@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 
-from Routes.UserConnections import conn_router
+from Handler.handler import conn_router
 
 app = FastAPI()
 
