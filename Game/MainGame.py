@@ -2,7 +2,6 @@ from Handler.Connections import ConnetionManager
 from fastapi import WebSocket
 import random
 from datetime import datetime, timedelta, timezone
-from copy import deepcopy
 
 class MainGame:
     def __init__(self):
@@ -15,18 +14,7 @@ class MainGame:
 
     def get_all_users(self):
         print("------- Original connections ------")
-        print(self.connection.connections_dict)
-
-        # Build a new dict without the WebSocket objects
-        filtered_users = {}
-        for client_id, client_info in self.connection.connections_dict.items():
-            filtered_users[client_id] = {
-                key: value for key, value in client_info.items() if key != "ws"
-            }
-
-        print("------- Filtered connections (no ws) ------")
-        print(filtered_users)
-        return filtered_users
+        pass
 
     def choose_word(self):
         self.category, self.word = "disabilty", "shennoy"
@@ -42,6 +30,7 @@ class MainGame:
         self.game_status["end_time"] = round(time,3)
         return self.game_status
 
+# investigating round order
     def investigating(self):
         clients_ids = list(self.connection.connections_dict.keys())
         random.shuffle(clients_ids)
@@ -66,7 +55,7 @@ class MainGame:
 
 game = MainGame()
 game.connection = ConnetionManager()
-game.imposter = "user 1"
+#game.imposter = "user 1"
 #game.connection.connections_dict = {
 #    "user 1":{"ws":"websocket","client":"name 1"},
 #    "user 2":{"ws":"websocket","client":"name 2"},
