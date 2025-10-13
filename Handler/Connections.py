@@ -22,6 +22,7 @@ class ConnetionManager:
             if len(self.connections_dict) == 1:
                 self.connections_dict[client_id].IsHost = True
 
+            self.connections_dict[client_id].__ws = websocket
             filt = self.connections_dict[client_id].dict()
             return {
                 "success":True, 
@@ -29,23 +30,20 @@ class ConnetionManager:
                 "message":f"{client_id} has joined"
                 }
 
-        await websocket.close(code=1001, reason=f"{client_id} already has joined in" )
+        await websocket.close(code=400, reason=f"{client_id} already has joined in" )
         return {"success":False, "message":f"{client_id} already has joined in"}
         
     def disconnect(self, client_id):
-        self.connections_dict.pop(client_id)
-        print(self.connections_dict, "fkidps")
+        print(self.connections_dict.pop(client_id), "was disconnected")
+       
 
     async def echo_all(self, msg):
         disconnected_clients = []
         
         for client in list(self.connections_dict.keys()):
             try:
-                if "ws" not in self.connections_dict[client]:
-                    disconnected_clients.append(client)
-                    continue
-                    
-                await self.connections_dict[client]["ws"].send_text(json.dumps(msg))
+                  
+                await self.connections_dict[client].__ws.send_text(json.dumps(msg))
                 
             except Exception as e:
                 print(f"Failed to send to {client}: {str(e)}")
