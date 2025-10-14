@@ -8,7 +8,13 @@ class Player(BaseModel):
     words: Optional[list[str]] = []
     __ws:Optional[WebSocket] = PrivateAttr(default=None)
 
+    @property
+    def ws(self) -> WebSocket: 
+        return self.__ws
 
+    @ws.setter
+    def ws(self, ws: WebSocket):
+        self.__ws = ws
 
 
 

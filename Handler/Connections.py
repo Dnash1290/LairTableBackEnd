@@ -22,8 +22,10 @@ class ConnetionManager:
             if len(self.connections_dict) == 1:
                 self.connections_dict[client_id].IsHost = True
 
-            self.connections_dict[client_id].__ws = websocket
-            filt = self.connections_dict[client_id].dict()
+            self.connections_dict[client_id].ws = websocket
+            filt = self.connections_dict[client_id].model_dump()
+
+            print(self.connections_dict[client_id], self.connections_dict[client_id].ws,"########  WEBSOCKET ########")
             return {
                 "success":True, 
                 "client":filt,
@@ -42,11 +44,12 @@ class ConnetionManager:
         
         for client in list(self.connections_dict.keys()):
             try:
-                  
-                await self.connections_dict[client].__ws.send_text(json.dumps(msg))
+                
+                await self.connections_dict[client].ws.send_text(json.dumps(msg))
                 
             except Exception as e:
                 print(f"Failed to send to {client}: {str(e)}")
+                print("websocket failed")
                 disconnected_clients.append(client)
                 
         # Clean up disconnected clients

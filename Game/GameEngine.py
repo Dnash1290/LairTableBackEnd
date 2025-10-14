@@ -1,12 +1,20 @@
-from .modules import UserActivity
+from Game.modules.UserActivity import *
 from fastapi import WebSocket
 from Game.MainGame import game
 import time, asyncio
 import traceback
 
 clients = game.connection.connections_dict
-game_start_time = 4
-game_investigation_time = 3
+start_time = 4
+investigation_time = 20
+hint_data = None
+hint_event = asyncio.Event()
+
+async def recive_hint(ws: WebSocket, client_id, data:PlayerHint):
+    print("data recived" ,data)
+    global hint_data
+    hint_data = data.model_dump()
+    hint_event.set()
 
 async def investigations():
     try:
@@ -15,7 +23,7 @@ async def investigations():
         for client in round_order:
            
             client_info = clients[client].model_dump()
-            game_status = game.time_stp("investigating", game_investigation_time)
+            game_status = game.time_stp("investigating", investigation_time)
 
             playload = {
                 "action": "game.investigation",
@@ -27,12 +35,26 @@ async def investigations():
 
             try:
                 await game.connection.echo_all(playload)
-                print(playload)
-   
-                time.sleep(game_investigation_time)
-            except Exception as e:
-                print(f"Failed to send message to {client}: {str(e)}")
+                #recieve_task = asyncio.create_task(hint_event)
+                await asyncio.wait_for(hint_event.wait(),
+                    timeout=investigation_time
+                )
+               
+                hint_event.clear()
+                await game.connection.echo_all(hint_data)
+
+            except asyncio.TimeoutError as e:
                 
+                await game.connection.echo_all({
+                    "action": "player.hint",
+                    "data":{
+                        "hint": None
+                    }
+                })
+                print(f"Failed to send message to {client}: {str(e)}")
+                print("maybe asyncio failed idk")
+
+        print("end")
     except Exception as e:
         traceback.print_exc()
         print(f"Investigation failed: {str(e)}")
@@ -42,7 +64,7 @@ async def investigations():
         
 
 async def game_start(ws:WebSocket, client_id:str, data):
-    
+
     if clients[client_id].IsHost is False:
         await ws.send_json({
             "action": "error.log",
@@ -59,7 +81,7 @@ async def game_start(ws:WebSocket, client_id:str, data):
 
     imposter:str = game.choose_imposter()
     game_word:dict = game.choose_word()
-    game_status:dict = game.time_stp("game starting",game_start_time)
+    game_status:dict = game.time_stp("game starting",start_time)
     
     await game.connection.echo_all({
         "action":"game.starting",
@@ -70,9 +92,11 @@ async def game_start(ws:WebSocket, client_id:str, data):
             }})
 
     print("using sleep ##################")
-    time.sleep(game_start_time)
+    time.sleep(start_time)
     await investigations()
 
     
 async def player_info(ws:WebSocket, client_id:str, data:dict):
     pass
+
+

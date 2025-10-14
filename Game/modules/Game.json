@@ -1,0 +1,14 @@
+{
+    "player_actions":[
+        "player.chat",
+        "game.start",
+        "player.info",
+        "player.hint"
+    ],
+
+    "game_actions":[
+        "game.starting",
+        "game.investigating",
+        "error.log"
+    ]
+}

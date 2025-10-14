@@ -5,7 +5,6 @@ class ChatAct(BaseModel):
     action: Literal["player.chat"]
     data:dict
 
-
 class StartAct(BaseModel):
     action: Literal["game.start"]
     data:dict
@@ -13,3 +12,7 @@ class StartAct(BaseModel):
 class PlayerInfo(BaseModel):
     action:Literal["player.info"]
     data:dict
+
+class PlayerHint(BaseModel):
+    action: Literal["player.hint"]
+    data: dict
