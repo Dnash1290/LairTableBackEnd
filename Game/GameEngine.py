@@ -92,8 +92,8 @@ async def game_start(ws:WebSocket, client_id:str, data):
             }})
 
     print("using sleep ##################")
-    time.sleep(start_time)
-    await investigations()
+    await asyncio.sleep(start_time)
+    asyncio.create_task(investigations())
 
     
 async def player_info(ws:WebSocket, client_id:str, data:dict):

@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import sqlite3
-
+import sqlite3, uvicorn, sys
 from Handler.handler import conn_router
 
+sys.dont_write_bytecode = True
 app = FastAPI()
 
 # Allow React frontend to connect
@@ -27,3 +27,4 @@ def read_root():
 @app.get("/api/test")
 def test_endpoint():
     return {"data": "This is test data from backend"}
+
