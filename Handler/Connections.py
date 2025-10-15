@@ -44,7 +44,6 @@ class ConnetionManager:
         
         for client in list(self.connections_dict.keys()):
             try:
-                
                 await self.connections_dict[client].ws.send_text(json.dumps(msg))
                 
             except Exception as e:

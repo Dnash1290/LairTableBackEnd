@@ -3,7 +3,8 @@
         "player.chat",
         "game.start",
         "player.info",
-        "player.hint"
+        "player.hint",
+        "player.vote"
     ],
 
     "game_actions":[

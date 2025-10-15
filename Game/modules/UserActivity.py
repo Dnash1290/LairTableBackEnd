@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Literal, Dict
+from typing import Literal, Dict, Any
 
 class ChatAct(BaseModel):
     action: Literal["player.chat"]
@@ -13,6 +13,14 @@ class PlayerInfo(BaseModel):
     action:Literal["player.info"]
     data:dict
 
+class Word(BaseModel):word: str
+
 class PlayerHint(BaseModel):
     action: Literal["player.hint"]
-    data: dict
+    data: Word
+
+class Vote(BaseModel): vote: str
+
+class PlayerVote(BaseModel):
+    action: Literal["player.vote"]
+    data: Vote

@@ -5,7 +5,8 @@ from fastapi import WebSocket
 class Player(BaseModel):
     username: str
     IsHost: bool = False
-    words: Optional[list[str]] = []
+    words: list[str] = []
+    votes:list[str] = []
     __ws:Optional[WebSocket] = PrivateAttr(default=None)
 
     @property

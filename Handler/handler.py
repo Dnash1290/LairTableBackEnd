@@ -3,7 +3,7 @@ from Game.MainGame import game
 from typing import Dict, List, Type
 from Game.GameEngine import *
 from Game.modules.UserActivity import *
-import time
+from pydantic import ValidationError
 
 conn_router = APIRouter()
 
@@ -15,6 +15,22 @@ ACTION_HANDLERS: Dict[str,tuple[Type, callable]]={
     "player.info":(PlayerInfo, player_info),
     "player.hint":(PlayerHint, recive_hint)
 }
+
+async def validate_pydantic(websocket, client_id,action_type, msg):
+    try:
+        Model, handle = ACTION_HANDLERS[action_type]
+        data = Model(**msg)
+        await handle(websocket, client_id, data) 
+
+    except ValidationError as error:
+        payload = {
+            "action": "error.log",
+            "data":error.errors()
+        }
+
+        print(error)
+        game.connection.echo_all(payload)
+
 
 
 @conn_router.websocket("/ws/{room_id}/{client_id}")
@@ -35,11 +51,8 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
                 await websocket.send_json({
                     "action":"invalid action","action_name":action_type
                 })
-            #print(msg)
-            Model, handle = ACTION_HANDLERS[action_type]
-            data = Model(**msg)
-            await handle(websocket, client_id, data)         
-
+            await validate_pydantic(websocket, client_id, action_type, msg)
+      
     except WebSocketDisconnect:
         game.connection.disconnect(client_id)
         print(WebSocketDisconnect)
@@ -71,7 +84,6 @@ def get_users():
         temp_dic["data"]["message"] = f"{user} has joined"
         temp_dic["data"]["client"] =  filt
         temp.append(temp_dic)
-
  
     return{"clients": temp}
 

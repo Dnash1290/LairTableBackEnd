@@ -12,6 +12,7 @@ class MainGame:
         self.current_investigating: str
         self.word: str
         self.category:str
+        self.votes: list
 
     def get_all_users(self):
         print("------- Original connections ------")
