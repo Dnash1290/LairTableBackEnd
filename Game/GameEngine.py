@@ -3,6 +3,7 @@ from fastapi import WebSocket
 from Game.MainGame import game
 import time, asyncio
 import traceback
+from Game.HelperFunc import *
 
 clients = game.connection.connections_dict
 start_time = 4
@@ -11,17 +12,25 @@ hint_data = None
 hint_event = asyncio.Event()
 
 async def recive_hint(ws: WebSocket, client_id, data:PlayerHint):
-    print("data recived" ,data)
+    print("data recived" ,game.current_investigating, client_id)
+
+    if game.current_investigating != client_id:
+        await game.connection.echo_all({
+            "action":"error.log",
+            "message":f"{client_id} is not been currently investgating"
+        })
+        return
     global hint_data
     hint_data = data.model_dump()
     hint_event.set()
 
 async def investigations():
     try:
-        round_order = game.investigating()
-
+        round_order = game.investigating_list()
+        
         for client in round_order:
-           
+            
+            game.current_investigating = client
             client_info = clients[client].model_dump()
             game_status = game.time_stp("investigating", investigation_time)
 
@@ -65,18 +74,8 @@ async def investigations():
 
 async def game_start(ws:WebSocket, client_id:str, data):
 
-    if clients[client_id].IsHost is False:
-        await ws.send_json({
-            "action": "error.log",
-            "data":{"message":f"{client_id} is not the host to start a match"}
-        })
-        return
-
-    if len(clients) < 3:
-        await ws.send_json({
-            "action": "error.log",
-            "data":{"message": "not enough players to start the game"}
-        })
+    if validate_start(client_id):
+        await game.connection.echo_all(validate_start(client_id))
         return
 
     imposter:str = game.choose_imposter()

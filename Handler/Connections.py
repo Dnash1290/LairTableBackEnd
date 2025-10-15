@@ -25,7 +25,7 @@ class ConnetionManager:
             self.connections_dict[client_id].ws = websocket
             filt = self.connections_dict[client_id].model_dump()
 
-            print(self.connections_dict[client_id], self.connections_dict[client_id].ws,"########  WEBSOCKET ########")
+            #print(self.connections_dict[client_id], self.connections_dict[client_id].ws,"########  WEBSOCKET ########")
             return {
                 "success":True, 
                 "client":filt,
@@ -39,7 +39,7 @@ class ConnetionManager:
         print(self.connections_dict.pop(client_id), "was disconnected")
        
 
-    async def echo_all(self, msg):
+    async def echo_all(self, msg:dict):
         disconnected_clients = []
         
         for client in list(self.connections_dict.keys()):

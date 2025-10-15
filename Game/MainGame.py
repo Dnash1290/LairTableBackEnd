@@ -9,6 +9,7 @@ class MainGame:
         self.chat: None
         self.game_status:dict = {}
         self.imposter :str
+        self.current_investigating: str
         self.word: str
         self.category:str
 
@@ -31,7 +32,7 @@ class MainGame:
         return self.game_status
 
 # investigating round order
-    def investigating(self):
+    def investigating_list(self):
         clients_ids = list(self.connection.connections_dict.keys())
         random.shuffle(clients_ids)
         chance = random.randint(1,1000)

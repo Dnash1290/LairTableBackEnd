@@ -23,7 +23,7 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
     join = await game.connection.connect(client_id, room_id, websocket)
     if not join["success"]:return
     payload = {"action":"player.log","data":join}
-    print(game.connection.connections_dict, "################# dict")
+    #print(game.connection.connections_dict, "################# dict")
     try:
         await game.connection.echo_all(payload)
 
@@ -35,7 +35,7 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
                 await websocket.send_json({
                     "action":"invalid action","action_name":action_type
                 })
-            print(msg)
+            #print(msg)
             Model, handle = ACTION_HANDLERS[action_type]
             data = Model(**msg)
             await handle(websocket, client_id, data)         
