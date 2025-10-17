@@ -15,8 +15,8 @@ async def game_start(ws:WebSocket, client_id:str, data):
 
     imposter:str = game.choose_imposter()
     game_word:dict = game.choose_word()
-    game_status:dict = game.time_stp("game starting",start_time)
-    
+    game_status:dict = game.time_stp("game.starting",start_time)
+   
     await game.connection.echo_all({
         "action":"game.starting",
         "data":{
@@ -27,10 +27,13 @@ async def game_start(ws:WebSocket, client_id:str, data):
 
     print("using sleep ##################")
     await asyncio.sleep(start_time)
-    asyncio.create_task(investigations())
-
+    #await investigations()
+    print("start voting")
+    await voting()
+    
     #reset game status soo nest round can be started
     game.game_status = {}
+
 
     
 async def player_info(ws:WebSocket, client_id:str, data:dict):

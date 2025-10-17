@@ -4,6 +4,7 @@ from typing import Dict, List, Type
 from Game.GameEngine import *
 from Game.modules.UserActivity import *
 from pydantic import ValidationError
+import asyncio
 
 conn_router = APIRouter()
 
@@ -13,7 +14,8 @@ ACTION_HANDLERS: Dict[str,tuple[Type, callable]]={
 
     #player ------
     "player.info":(PlayerInfo, player_info),
-    "player.hint":(PlayerHint, recive_hint)
+    "player.hint":(PlayerHint, recive_hint),
+    "player.vote":(PlayerVote, recive_votes)
 }
 
 async def validate_pydantic(websocket, client_id,action_type, msg):
@@ -29,7 +31,7 @@ async def validate_pydantic(websocket, client_id,action_type, msg):
         }
 
         print(error)
-        game.connection.echo_all(payload)
+        await game.connection.echo_all(payload)
 
 
 
@@ -51,7 +53,10 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
                 await websocket.send_json({
                     "action":"invalid action","action_name":action_type
                 })
-            await validate_pydantic(websocket, client_id, action_type, msg)
+
+            asyncio.create_task(
+                validate_pydantic(websocket, client_id, action_type, msg)
+            )   
       
     except WebSocketDisconnect:
         game.connection.disconnect(client_id)

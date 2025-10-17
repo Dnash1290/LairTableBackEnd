@@ -6,7 +6,7 @@ class Player(BaseModel):
     username: str
     IsHost: bool = False
     words: list[str] = []
-    votes:list[str] = []
+    voted_name:str = None
     __ws:Optional[WebSocket] = PrivateAttr(default=None)
 
     @property

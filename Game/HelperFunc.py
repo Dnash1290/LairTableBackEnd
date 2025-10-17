@@ -3,6 +3,7 @@ from Game.MainGame import game
 from fastapi import WebSocket
 import asyncio, traceback
 from Game.modules.UserActivity import *
+from collections import Counter
 
 clients = game.connection.connections_dict
 investigation_time = 20
@@ -35,8 +36,7 @@ def validate_start(client_id:str):
 
 
 async def recive_hint(ws: WebSocket, client_id, hint:PlayerHint):
-    print("data recived" ,game.current_investigating, client_id)
-
+    
     if game.current_investigating != client_id:
         await game.connection.echo_all({
             "action":"error.log",
@@ -44,6 +44,7 @@ async def recive_hint(ws: WebSocket, client_id, hint:PlayerHint):
         })
         return
     
+    print("data recived" ,game.current_investigating, client_id)
     global hint_data
     hint_data = hint.model_dump()
     clients[client_id].words.append(hint.data.word)
@@ -59,7 +60,7 @@ async def investigations():
             
             game.current_investigating = client
             client_info = clients[client].model_dump()
-            game_status = game.time_stp("investigating", investigation_time)
+            game_status = game.time_stp("game.investigating", investigation_time)
 
             playload = {
                 "action": "game.investigation",
@@ -87,7 +88,7 @@ async def investigations():
                         "hint": None
                     }
                 })
-                print(f"Failed to send message to {client}: {str(e)}")
+                print(f"TIME IS UPPP {client}: {str(e)}")
                 print("maybe asyncio failed idk")
 
         print("end")
@@ -96,18 +97,65 @@ async def investigations():
         print(f"Investigation failed: {str(e)}")
         # Clean up any invalid connections
 
+
+def vote_results(count:dict):
+    voted_client = ""
+    votes = 0
+    
+    for key in count.keys():
+        if count[key] < votes:
+            continue
+        votes = count[key]
+        voted_client = key
+
+    if game.imposter != voted_client: 
+        
+        return [{"voted_client":voted_client}, {"is_imposter":False}]
+    
+    return [{"voted_client":voted_client},{"is_imposter":True}]
+
+
 async def recive_votes(ws: WebSocket, client_id:str, player:PlayerVote):
-    vote = player.data.vote
-    if vote not in clients:
+    player_vote = player.data.vote
+
+    try:
+        if game.game_status["status"] != "game.voting" :
+            print("game is not started yet")
+            return
+    except:
+        pass
+
+    vote_name = player_vote
+    if vote_name not in clients:
         print("vote invalid sinces user not found")
         return
-    
-    game.votes.append(vote)
-    clients[client_id].votes.append(vote)
-    
+
+    #if user already voted, then then the new vote is overwritten
+    if clients[client_id].voted_name is not None: 
+        old_vote = clients[client_id].voted_name
+        clients[client_id].voted_name = player_vote 
+
+        try:
+            index = game.votes.index(old_vote)
+            game.votes[index] = player_vote
+            print(f"{old_vote} is been overwritten by {player_vote}")
+        except ValueError as e :
+            print(e)
+        
+        return
+
+    game.votes.append(vote_name)
+    clients[client_id].voted_name = player_vote
+   
+    await game.connection.echo_all({
+        "action": "player.vote",
+        "data":{
+            "vote":vote_name 
+        }
+    })
 
 async def voting():
-    game_status = game.time_stp("voting",voting_time)
+    game_status = game.time_stp("game.voting",voting_time)
     await game.connection.echo_all({
         "action": "game.voting",
         "data":{
@@ -116,5 +164,19 @@ async def voting():
         }
     })
     await asyncio.sleep(voting_time)
+    count = Counter(game.votes)
+
+    voted_client = vote_results(count)
+    print("voting completed", game.votes, "most voted client", voted_client)
+    
+
+    await game.connection.echo_all({
+        "action": "game.vote_results",
+        "data":{ 
+            "vote":count,
+            **voted_client[0],
+            **voted_client[1]
+        }
+    })
 
 

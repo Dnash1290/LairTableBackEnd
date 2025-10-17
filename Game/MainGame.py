@@ -9,10 +9,10 @@ class MainGame:
         self.chat: None
         self.game_status:dict = {}
         self.imposter :str
-        self.current_investigating: str
+        self.current_investigating: str = ""
         self.word: str
         self.category:str
-        self.votes: list
+        self.votes: list = []
 
     def get_all_users(self):
         print("------- Original connections ------")

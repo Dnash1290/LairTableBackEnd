@@ -1,0 +1,14 @@
+{
+    "action":"player.hint",
+    "data":{
+        "word":"player 1"
+    }
+}
+
+
+{
+    "action":"player.vote",
+    "data":{
+        "vote":"player 2"
+    }
+}

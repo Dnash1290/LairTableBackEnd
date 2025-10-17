@@ -10,6 +10,14 @@
     "game_actions":[
         "game.starting",
         "game.investigating",
+        "game.voting",
         "error.log"
     ]
+}
+
+{
+    "action":"player.vote",
+    "data":{
+        "vote":"user 3"
+    }
 }
