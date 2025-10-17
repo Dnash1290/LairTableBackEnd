@@ -2,6 +2,7 @@ from Handler.Connections import ConnetionManager
 from fastapi import WebSocket
 import random
 from datetime import datetime, timedelta, timezone
+from Handler.Player import Player
 
 class MainGame:
     def __init__(self):
@@ -13,6 +14,8 @@ class MainGame:
         self.word: str
         self.category:str
         self.votes: list = []
+        self.remaining_players:dict[str, Player] = {}
+        
 
     def get_all_users(self):
         print("------- Original connections ------")
@@ -32,25 +35,7 @@ class MainGame:
         self.game_status["end_time"] = round(time,3)
         return self.game_status
 
-# investigating round order
-    def investigating_list(self):
-        clients_ids = list(self.connection.connections_dict.keys())
-        random.shuffle(clients_ids)
-        chance = random.randint(1,1000)
-        
 
-        #checks if imposter 1 in the list then list re suffled, there is 1000/1 chance its not
-        if clients_ids[0] != self.imposter:return clients_ids
-        if chance != 69: 
-            num = random.randint(1,len(clients_ids)-1)
-            print("num", num)
-            temp = clients_ids[num]
-            clients_ids[num] = clients_ids[0]
-            clients_ids[0] = temp 
-            return clients_ids
-
-        print("\n\n\n\n --------------UN LUCKY IMPOSTER--------------")
-        return clients_ids
 
 
 

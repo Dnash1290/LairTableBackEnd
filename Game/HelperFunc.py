@@ -4,8 +4,12 @@ from fastapi import WebSocket
 import asyncio, traceback
 from Game.modules.UserActivity import *
 from collections import Counter
+import random
+from Handler.Player import Player
 
-clients = game.connection.connections_dict
+all_clients = game.connection.connections_dict
+
+
 investigation_time = 20
 voting_time = 30
 
@@ -20,13 +24,13 @@ def validate_start(client_id:str):
             "data": {"message": "game is already in progess"}
         }
 
-    if clients[client_id].IsHost is False:
+    if all_clients[client_id].IsHost is False:
         return {
             "action": "error.log",
             "data":{"message":f"{client_id} is not the host to start a match"}
         }
 
-    if len(clients) < 3:
+    if len(all_clients) < 3:
         return {
             "action": "error.log",
             "data":{"message": "not enough players to start the game"}
@@ -47,19 +51,38 @@ async def recive_hint(ws: WebSocket, client_id, hint:PlayerHint):
     print("data recived" ,game.current_investigating, client_id)
     global hint_data
     hint_data = hint.model_dump()
-    clients[client_id].words.append(hint.data.word)
+    game.remaining_players[client_id].words.append(hint.data.word)
     hint_event.set()
 
+
+# investigating round order
+def investigating_list():
+    clients_ids = list(game.remaining_players.keys())
+    random.shuffle(clients_ids)
+    chance = random.randint(1,1000)
+    
+
+    #checks if imposter 1 in the list then list re suffled, there is 1000/1 chance its not
+    if clients_ids[0] != game.imposter:return clients_ids
+    if chance != 69: 
+        num = random.randint(1,len(clients_ids)-1)
+        print("num", num)
+        temp = clients_ids[num]
+        clients_ids[num] = clients_ids[0]
+        clients_ids[0] = temp 
+        return clients_ids
+
+    print("\n\n\n\n --------------UN LUCKY IMPOSTER--------------")
+    return clients_ids
 
 
 async def investigations():
     try:
-        round_order = game.investigating_list()
-        
+        round_order = investigating_list()
         for client in round_order:
             
             game.current_investigating = client
-            client_info = clients[client].model_dump()
+            client_info = game.remaining_players[client].model_dump()
             game_status = game.time_stp("game.investigating", investigation_time)
 
             playload = {
@@ -109,7 +132,7 @@ def vote_results(count:dict):
         voted_client = key
 
     if game.imposter != voted_client: 
-        
+
         return [{"voted_client":voted_client}, {"is_imposter":False}]
     
     return [{"voted_client":voted_client},{"is_imposter":True}]
@@ -126,14 +149,15 @@ async def recive_votes(ws: WebSocket, client_id:str, player:PlayerVote):
         pass
 
     vote_name = player_vote
-    if vote_name not in clients:
+    
+    if vote_name not in game.remaining_players and client_id not in game.remaining_players:
         print("vote invalid sinces user not found")
         return
 
     #if user already voted, then then the new vote is overwritten
-    if clients[client_id].voted_name is not None: 
-        old_vote = clients[client_id].voted_name
-        clients[client_id].voted_name = player_vote 
+    if game.remaining_players[client_id].voted_name is not None: 
+        old_vote = game.remaining_players[client_id].voted_name
+        game.remaining_players[client_id].voted_name = player_vote 
 
         try:
             index = game.votes.index(old_vote)
@@ -145,7 +169,7 @@ async def recive_votes(ws: WebSocket, client_id:str, player:PlayerVote):
         return
 
     game.votes.append(vote_name)
-    clients[client_id].voted_name = player_vote
+    game.remaining_players[client_id].voted_name = player_vote
    
     await game.connection.echo_all({
         "action": "player.vote",
@@ -168,7 +192,12 @@ async def voting():
 
     voted_client = vote_results(count)
     print("voting completed", game.votes, "most voted client", voted_client)
-    
+
+    try:
+        game.remaining_players.pop(voted_client[0]["voted_client"])
+    except TypeError as e:
+        print(e)
+        print("might be a draw ngl")
 
     await game.connection.echo_all({
         "action": "game.vote_results",

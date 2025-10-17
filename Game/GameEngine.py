@@ -8,7 +8,9 @@ clients = game.connection.connections_dict
 start_time = 4
 
 async def game_start(ws:WebSocket, client_id:str, data):
-
+    
+    game.remaining_players = clients.copy()
+    
     if validate_start(client_id):
         await game.connection.echo_all(validate_start(client_id))
         return
@@ -30,6 +32,7 @@ async def game_start(ws:WebSocket, client_id:str, data):
     #await investigations()
     print("start voting")
     await voting()
+    print(len(game.remaining_players))
     
     #reset game status soo nest round can be started
     game.game_status = {}
