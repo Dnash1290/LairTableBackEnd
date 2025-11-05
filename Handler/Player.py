@@ -14,7 +14,7 @@ class Player(BaseModel):
         return self.__ws
 
     @ws.setter
-    def ws(self, ws: WebSocket):
+    def ws(self, ws: WebSocket): 
         self.__ws = ws
 
 

@@ -4,6 +4,8 @@ import random
 from datetime import datetime, timedelta, timezone
 from Handler.Player import Player
 
+# need to focus on when user disconnects? like what happenes to the round
+
 class MainGame:
     def __init__(self):
         self.connection: ConnetionManager

@@ -40,8 +40,8 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
    
     join = await game.connection.connect(client_id, room_id, websocket)
     if not join["success"]:return
-    payload = {"action":"player.log","data":join}
-    #print(game.connection.connections_dict, "################# dict")
+    payload = {"action":"player.join","data":join}
+    print(game.connection.connections_dict, "################# dict")
     try:
         await game.connection.echo_all(payload)
 
@@ -62,7 +62,7 @@ async def connect_client(websocket: WebSocket, room_id, client_id):
         game.connection.disconnect(client_id)
         print(WebSocketDisconnect)
         await game.connection.echo_all({
-            "action":"player.log",
+            "action":"player.left",
             "data":{
                 "message":f"player {client_id} has left the game",
                 "client":client_id
@@ -81,13 +81,11 @@ def get_users():
     temp = []
 
     for user in keys:
-        filt = game.connection.connections_dict[user].copy()
-        filt.pop("ws", None)
+        filt = game.connection.connections_dict[user].model_dump()
        
-        temp_dic = {"data":{}}
-        temp_dic["data"]["success"] = True
-        temp_dic["data"]["message"] = f"{user} has joined"
-        temp_dic["data"]["client"] =  filt
+        temp_dic = {}
+        temp_dic["message"] = f"{user} has joined"
+        temp_dic["client"] =  filt
         temp.append(temp_dic)
  
     return{"clients": temp}
