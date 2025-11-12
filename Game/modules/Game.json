@@ -13,12 +13,14 @@
         "game.voting",
         "game.voting_done",
         "error.log"
-    ]
+    ],
+
+    "ehh":{
+        "action":"player.vote",
+        "data":{
+            "vote":"user 3"
+        }
+    }
+
 }
 
-{
-    "action":"player.vote",
-    "data":{
-        "vote":"user 3"
-    }
-}

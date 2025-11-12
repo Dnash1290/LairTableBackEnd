@@ -10,12 +10,11 @@ from Handler.Player import Player
 all_clients = game.connection.connections_dict
 
 
-investigation_time = 20
+investigation_time = 15
 voting_time = 30
 
 hint_data = None
 hint_event = asyncio.Event()
-
 
 def validate_start(client_id:str):
     if "status" in game.game_status:
@@ -50,7 +49,7 @@ async def recive_hint(ws: WebSocket, client_id, hint:PlayerHint):
     
     print("data recived" ,game.current_investigating, client_id)
     global hint_data
-    hint_data = hint.model_dump()
+    hint_data = hint.data.word
     game.remaining_players[client_id].words.append(hint.data.word)
     hint_event.set()
 
@@ -82,13 +81,12 @@ async def investigations():
         for client in round_order:
             
             game.current_investigating = client
-            client_info = game.remaining_players[client].model_dump()
             game_status = game.time_stp("game.investigating", investigation_time)
 
             playload = {
                 "action": "game.investigation",
                 "data": {
-                    "investigating": client_info,
+                    "investigating": game.remaining_players[client].model_dump(),
                     "game_status": game_status
                 }
             }
@@ -101,14 +99,22 @@ async def investigations():
                 )
                
                 hint_event.clear()
-                await game.connection.echo_all(hint_data)
+                await game.connection.echo_all({
+                    "action":"player.hint",
+                    "data":{
+                        "hint":hint_data,
+                        **game.remaining_players[client].model_dump()
+                    }
+                })
 
-            except asyncio.TimeoutError as e:
+            except asyncio.TimeoutError as e: 
                 
+                game.remaining_players[client].words.append(None)
                 await game.connection.echo_all({
                     "action": "player.hint",
                     "data":{
-                        "hint": None
+                        "hint": None,
+                        **game.remaining_players[client].model_dump()
                     }
                 })
                 print(f"TIME IS UPPP {client}: {str(e)}")

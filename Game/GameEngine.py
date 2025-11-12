@@ -27,9 +27,9 @@ async def game_start(ws:WebSocket, client_id:str, data):
             "game_status":game_status
             }})
 
-    print("using sleep ##################")
     await asyncio.sleep(start_time)
-    #await investigations()
+    print("start investigating....############################")
+    await investigations()
     print("start voting")
     await voting()
     print(len(game.remaining_players))

@@ -1,0 +1,10 @@
+things to add:
+-when host disconnects close room
+-when clients disconnect remove them from players
+-clean up disconnects
+-add rooms and games 
+-payload templet
+
+Front end
+-clean up disconnects
+-have seperate use contexts for performance !
