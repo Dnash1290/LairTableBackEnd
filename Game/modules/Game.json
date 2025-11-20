@@ -12,6 +12,7 @@
         "game.investigating",
         "game.voting",
         "game.voting_done",
+        "game.vote_results",
         "error.log"
     ],
 

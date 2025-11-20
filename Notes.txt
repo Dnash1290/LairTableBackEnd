@@ -5,6 +5,9 @@ things to add:
 -add rooms and games 
 -payload templet
 
+errors
+-if no one voted the server crashes
+
 Front end
 -clean up disconnects
 -have seperate use contexts for performance !
