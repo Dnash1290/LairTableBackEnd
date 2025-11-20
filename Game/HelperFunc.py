@@ -169,17 +169,26 @@ async def recive_votes(ws: WebSocket, client_id:str, player:PlayerVote):
             index = game.votes.index(old_vote)
             game.votes[index] = player_vote
             print(f"{old_vote} is been overwritten by {player_vote}")
+
         except ValueError as e :
             print(e)
-        
+
+        await game.connection.echo_all({
+            "action": "player.vote",
+            "data":{
+                "voter": client_id,
+                "vote":player_vote 
+            }
+        })
         return
 
     game.votes.append(vote_name)
     game.remaining_players[client_id].voted_name = player_vote
-   
+    print ("player", client_id, "voted", vote_name)
     await game.connection.echo_all({
         "action": "player.vote",
         "data":{
+            "voter": client_id,
             "vote":vote_name 
         }
     })
