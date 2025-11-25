@@ -11,11 +11,14 @@ class MainGame:
         self.connection: ConnetionManager
         self.chat: None
         self.game_status:dict = {}
-        self.imposter :str
-        self.current_investigating: str = ""
-        self.word: str
+
         self.category:str
-        self.votes: list = []
+        self.word: str
+        self.current_investigating: str = ""
+        
+        self.imposter:str
+        self.votes:list = []
+        self.voted_user: str = None 
         self.remaining_players:dict[str, Player] = {}
         
 
@@ -24,8 +27,13 @@ class MainGame:
         pass
 
     def choose_word(self):
-        self.category, self.word = "disabilty", "shennoy"
-        return {"category":"disability", "word":"shennoy", "words":["there will be a list of words here"]}
+        import json
+        with open("Game\words.json", "r") as f:data = json.load(f)
+        category = random.choice(list(data.keys()))
+        word = random.choice(data[category])
+
+        self.category, self.word = category, word
+        return {"category":category, "word":word, "words":data[category]}
     
     def choose_imposter(self):
         self.imposter = random.choice(list(self.connection.connections_dict.keys()))
@@ -37,6 +45,19 @@ class MainGame:
         self.game_status["end_time"] = round(time,3)
         return self.game_status
 
+    def clear_game(self):
+        self.connection: ConnetionManager
+        self.chat: None
+        self.game_status:dict = {}
+
+        self.category:str
+        self.word: str
+        self.current_investigating: str = ""
+        
+        self.imposter:str
+        self.votes:list = []
+        self.voted_user: str = None 
+        self.remaining_players:dict[str, Player] = {}
 
 
 
@@ -44,6 +65,7 @@ class MainGame:
 
 game = MainGame()
 game.connection = ConnetionManager()
+
 #game.imposter = "user 1"
 #game.connection.connections_dict = {
 #    "user 1":{"ws":"websocket","client":"name 1"},

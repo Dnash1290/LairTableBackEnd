@@ -210,6 +210,7 @@ async def voting():
 
     try:
         game.remaining_players.pop(voted_client[0]["voted_client"])
+        game.voted_user = voted_client[0]["voted_client"]
     except TypeError as e:
         print(e)
         print("might be a draw ngl")

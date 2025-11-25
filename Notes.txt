@@ -10,4 +10,5 @@ errors
 
 Front end
 -clean up disconnects
+-when the last selected user turn is completed the selected css still remains
 -have seperate use contexts for performance !

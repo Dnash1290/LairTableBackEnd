@@ -28,15 +28,21 @@ async def game_start(ws:WebSocket, client_id:str, data):
             }})
 
     await asyncio.sleep(start_time)
-    print("start investigating....############################")
-    await investigations()
-    print("start voting")
-    await voting()
-    print(len(game.remaining_players))
     
     #reset game status soo nest round can be started
-    game.game_status = {}
+    remaing_player_num = len(game.remaining_players)
 
+    while remaing_player_num >= 3:
+        if game.voted_user == game.imposter: break
+    
+        print("start investigating....############################")
+        await investigations()
+        print("start voting")
+        await voting()
+        remaing_player_num = len(game.remaining_players)
+
+    game.clear_game()
+    print("####### game over #########")
 
     
 async def player_info(ws:WebSocket, client_id:str, data:dict):
