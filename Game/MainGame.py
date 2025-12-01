@@ -27,13 +27,23 @@ class MainGame:
         pass
 
     def choose_word(self):
-        import json
-        with open(r"Game\words.json", "r") as f:data = json.load(f)
+        import os, json
+        file_path = os.path.join(os.path.dirname(__file__), "words.json")
+
+        with open(file_path, "r") as f:
+            data = json.load(f)
+
         category = random.choice(list(data.keys()))
         word = random.choice(data[category])
 
-        self.category, self.word = category, word
-        return {"category":category, "word":word, "words":data[category]}
+        self.category = category
+        self.word = word
+
+        return {
+            "category": category,
+            "word": word,
+            "words": data[category]
+        }
     
     def choose_imposter(self):
         self.imposter = random.choice(list(self.connection.connections_dict.keys()))
