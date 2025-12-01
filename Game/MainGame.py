@@ -28,7 +28,7 @@ class MainGame:
 
     def choose_word(self):
         import json
-        with open("Game\words.json", "r") as f:data = json.load(f)
+        with open(r"Game\words.json", "r") as f:data = json.load(f)
         category = random.choice(list(data.keys()))
         word = random.choice(data[category])
 
